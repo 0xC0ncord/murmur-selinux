@@ -1,0 +1,100 @@
+policy_module(murmur, 1.0)
+
+gen_require(`
+    type cert_t;
+')
+
+########################################
+#
+# Declarations
+#
+
+type murmur_t;
+type murmur_exec_t;
+application_executable_file(murmur_exec_t)
+init_daemon_domain(murmur_t, murmur_exec_t)
+
+type murmur_initrc_exec_t;
+init_script_file(murmur_initrc_exec_t)
+
+type murmur_etc_t;
+files_config_file(murmur_etc_t)
+
+type murmur_var_lib_t;
+files_type(murmur_var_lib_t)
+
+type murmur_cache_t;
+files_type(murmur_cache_t)
+
+type murmur_log_t;
+logging_log_file(murmur_log_t)
+
+type murmur_runtime_t alias murmur_var_run_t;
+files_pid_file(murmur_runtime_t)
+init_daemon_pid_file(murmur_runtime_t, dir, "murmur")
+
+type murmur_port_t;
+corenet_port(murmur_port_t)
+
+########################################
+#
+# Local policy
+#
+
+allow murmur_t self:process { execstack execmem getsched setsched signal };
+allow murmur_t self:tcp_socket all_tcp_socket_perms;
+allow murmur_t self:udp_socket all_udp_socket_perms;
+allow murmur_t murmur_port_t:udp_socket { name_bind };
+allow murmur_t murmur_port_t:tcp_socket { name_bind };
+
+allow murmur_t self:unix_dgram_socket create_socket_perms;
+allow murmur_t self:unix_stream_socket create_stream_socket_perms;
+allow murmur_t self:netlink_route_socket all_netlink_route_socket_perms;
+allow murmur_t self:fifo_file rw_fifo_file_perms;
+
+corenet_port(murmur_port_t)
+corenet_tcp_bind_generic_node(murmur_t)
+corenet_udp_bind_generic_node(murmur_t)
+
+fs_getattr_xattr_fs(murmur_t)
+dev_read_urand(murmur_t)
+
+corecmd_search_bin(murmur_t)
+
+domain_use_interactive_fds(murmur_t)
+
+files_read_etc_files(murmur_initrc_exec_t)
+files_read_etc_files(murmur_t)
+
+miscfiles_read_localization(murmur_t)
+
+list_dirs_pattern(murmur_t, cert_t, cert_t)
+search_dirs_pattern(murmur_t, cert_t, cert_t)
+read_files_pattern(murmur_t, cert_t, cert_t)
+read_lnk_files_pattern(murmur_t, cert_t, cert_t)
+
+list_dirs_pattern(murmur_t, murmur_etc_t, murmur_etc_t)
+search_dirs_pattern(murmur_t, murmur_etc_t, murmur_etc_t)
+read_files_pattern(murmur_t, murmur_etc_t, murmur_etc_t)
+read_lnk_files_pattern(murmur_t, murmur_etc_t, murmur_etc_t)
+
+files_manage_generic_tmp_dirs(murmur_t)
+files_manage_generic_tmp_files(murmur_t)
+manage_dirs_pattern(murmur_t, murmur_log_t, murmur_log_t)
+manage_files_pattern(murmur_t, murmur_log_t, murmur_log_t)
+manage_lnk_files_pattern(murmur_t, murmur_log_t, murmur_log_t)
+logging_log_filetrans(murmur_t, murmur_log_t, { dir file lnk_file })
+
+manage_dirs_pattern(murmur_t, murmur_var_lib_t, murmur_var_lib_t)
+manage_files_pattern(murmur_t, murmur_var_lib_t, murmur_var_lib_t)
+manage_lnk_files_pattern(murmur_t, murmur_var_lib_t, murmur_var_lib_t)
+files_var_lib_filetrans(murmur_t, murmur_var_lib_t, { dir file lnk_file })
+
+manage_dirs_pattern(murmur_t, murmur_cache_t, murmur_cache_t)
+manage_files_pattern(murmur_t, murmur_cache_t, murmur_cache_t)
+filetrans_pattern(murmur_t, murmur_var_lib_t, murmur_cache_t, { file dir })
+
+manage_dirs_pattern(murmur_t, murmur_var_run_t, murmur_var_run_t)
+manage_files_pattern(murmur_t, murmur_var_run_t, murmur_var_run_t)
+manage_lnk_files_pattern(murmur_t, murmur_var_run_t, murmur_var_run_t)
+files_pid_filetrans(murmur_t, murmur_var_run_t, { dir file lnk_file })

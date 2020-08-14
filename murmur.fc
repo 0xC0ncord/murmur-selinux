@@ -1,0 +1,7 @@
+/etc/rc\.d/init\.d/murmur            -- gen_context(system_u:object_r:murmur_initrc_exec_t,s0)
+/usr/bin/murmurd                     -- gen_context(system_u:object_r:murmur_exec_t,s0)
+/etc/murmur(/.*)?                       gen_context(system_u:object_r:murmur_etc_t,s0)
+/var/lib/murmur(/.*)?                   gen_context(system_u:object_r:murmur_var_lib_t,s0)
+/var/lib/murmur/\.cache(/.*)?		gen_context(system_u:object_r:murmur_cache_t,s0)
+/var/log/murmur(/.*)?                   gen_context(system_u:object_r:murmur_log_t,s0)
+/run/murmur(/.*)?                       gen_context(system_u:object_r:murmur_runtime_t,s0)
